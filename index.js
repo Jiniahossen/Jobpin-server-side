@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const app=express();
 const port =process.env.PORT || 5000;
@@ -36,6 +36,7 @@ async function run() {
 
     const JObsDB=client.db('JOBDB');
     const jobCollections=JObsDB.collection('jobCollections');
+    const appliedJobsCollections=JObsDB.collection('Applied Jobs')
 
 
     //post data
@@ -54,7 +55,17 @@ async function run() {
       res.send(result);
     })
 
-    //get  specific user data
+    //get product by ID
+
+    app.get('/jobs/:id',async(req,res)=>{
+      const id=req.params.id;
+      const query={_id : new ObjectId(id)};
+      const cursor=jobCollections.find(query);
+      const result= await cursor.toArray();
+      res.send(result);
+    })
+
+    //get  specific user data by email
 
     app.get('/jobs/:email', async (req, res) => {
       const user = req.params.email;
@@ -65,7 +76,15 @@ async function run() {
     })
 
 
+    //Post applied jobs data
 
+    app.post('/applied-jobs',async(req,res)=>{
+       const body=req.body;
+       const result=await appliedJobsCollections.insertOne(body)
+       res.send(result);
+       console.log(result)
+    }
+    )
 
 
     // Send a ping to confirm a successful connection
