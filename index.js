@@ -45,7 +45,6 @@ async function run() {
       const body=req.body;
       const result=await jobCollections.insertOne(body);
       res.send(result);
-      console.log(result)
     })
 
     //get All data
@@ -76,15 +75,42 @@ async function run() {
     })
 
 
+    //delete specific data
+
+    app.delete('/jobs/:id',async(req,res)=>{
+      const id=req.params.id;
+      console.log(id);
+      const query={_id: new ObjectId(id)}
+      const result=await jobCollections.deleteOne(query);
+      res.send(result)
+    })
+
+
     //Post applied jobs data
 
     app.post('/applied-jobs',async(req,res)=>{
        const body=req.body;
        const result=await appliedJobsCollections.insertOne(body)
        res.send(result);
-       console.log(result)
+       console.log(result);
     }
     )
+
+    app.get('/applied-jobs', async (req, res) => {
+      const result = await appliedJobsCollections.find().toArray();
+      res.send(result);
+    })
+
+    //get applied job by email
+
+    app.get('/applied-jobs/:email',async(req,res)=>{
+      const user = req.params.email;
+      const query = { email: user };
+      const cursor = appliedJobsCollections.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+      console.log(result);
+    })
 
 
     // Send a ping to confirm a successful connection
